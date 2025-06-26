@@ -3,7 +3,8 @@ import { useDebounce } from '../hooks/useDebounce';
 
 export function DebounceSearchDemo() {
   const [input, setInput] = useState('');
-  const debounced = useDebounce(input, 500);
+  const [delay, setDelay] = useState(500);
+  const debounced = useDebounce(input, delay);
 
   useEffect(() => {
     if (debounced) {
@@ -13,19 +14,29 @@ export function DebounceSearchDemo() {
 
   return (
     <div>
-      <h2>Debounce Search Demo</h2>
-      <label>
-        Debounce Delay (ms):
-        <input type="number" defaultValue={500} onChange={e => {/* handle delay change if desired */}} />
+      <label style={{ display: 'block', marginBottom: '1rem' }}>
+        Debounce Delay (ms):&nbsp;
+        <input
+          type="number"
+          min={0}
+          step={100}
+          value={delay}
+          onChange={e => setDelay(Number(e.target.value))}
+        />
       </label>
-      <input
-        type="text"
-        placeholder="Type to search..."
-        value={input}
-        onChange={e => setInput(e.target.value)}
-      />
-      <p>Current Input: {input}</p>
-      <p>Debounced Value (after 500ms): {debounced}</p>
+
+      <label style={{ display: 'block', marginBottom: '1rem' }}>
+        Search:&nbsp;
+        <input
+          type="text"
+          placeholder="Type to search..."
+          value={input}
+          onChange={e => setInput(e.target.value)}
+        />
+      </label>
+
+      <p>Current Input: {input || <em>(empty)</em>}</p>
+      <p>Debounced Value: {debounced || <em>(waiting…)</em>}</p>
     </div>
   );
 }

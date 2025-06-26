@@ -26,18 +26,44 @@ export function usePagination({
 }: UsePaginationOptions): UsePaginationResult {
   const [currentPage, setCurrentPage] = useState(initialPage);
 
-  const totalPages = useMemo(() => Math.ceil(totalItems / itemsPerPage), [totalItems, itemsPerPage]);
-  const startIndex = useMemo(() => (currentPage - 1) * itemsPerPage, [currentPage, itemsPerPage]);
-  const endIndex = useMemo(() => Math.min(startIndex + itemsPerPage - 1, totalItems - 1), [startIndex, itemsPerPage, totalItems]);
-  const itemsOnCurrentPage = useMemo(() => endIndex - startIndex + 1, [startIndex, endIndex]);
+  // Total number of pages
+  const totalPages = useMemo(
+    () => Math.ceil(totalItems / itemsPerPage),
+    [totalItems, itemsPerPage]
+  );
 
-  const setPage = useCallback((page: number) => {
-    const p = Math.max(1, Math.min(page, totalPages));
-    setCurrentPage(p);
-  }, [totalPages]);
+  // Calculate start and end indices
+  const startIndex = useMemo(
+    () => (currentPage - 1) * itemsPerPage,
+    [currentPage, itemsPerPage]
+  );
+
+  const endIndex = useMemo(
+    () => Math.min(startIndex + itemsPerPage - 1, totalItems - 1),
+    [startIndex, itemsPerPage, totalItems]
+  );
+
+  // Number of items on the current page (handles last page size)
+  const itemsOnCurrentPage = useMemo(
+    () => {
+      if (totalItems === 0) return 0;
+      return endIndex - startIndex + 1;
+    },
+    [startIndex, endIndex, totalItems]
+  );
+
+  // Function to jump to a specific page, clamped between 1 and totalPages
+  const setPage = useCallback(
+    (page: number) => {
+      const safePage = Math.max(1, Math.min(page, totalPages));
+      setCurrentPage(safePage);
+    },
+    [totalPages]
+  );
 
   const nextPage = useCallback(() => setPage(currentPage + 1), [currentPage, setPage]);
   const prevPage = useCallback(() => setPage(currentPage - 1), [currentPage, setPage]);
+
   const canNextPage = currentPage < totalPages;
   const canPrevPage = currentPage > 1;
 

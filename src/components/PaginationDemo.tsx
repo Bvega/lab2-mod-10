@@ -1,33 +1,71 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { usePagination } from '../hooks/usePagination';
 
 export function PaginationDemo() {
   const totalItems = 123;
-  const { currentPage, totalPages, startIndex, endIndex, itemsOnCurrentPage, nextPage, prevPage, canNextPage, canPrevPage, setPage } =
-    usePagination({ totalItems, itemsPerPage: 10 });
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const items = Array.from({ length: totalItems }, (_, i) => `Item ${i + 1}`).slice(startIndex, endIndex + 1);
+  const {
+    currentPage,
+    totalPages,
+    startIndex,
+    endIndex,
+    itemsOnCurrentPage,
+    nextPage,
+    prevPage,
+    canNextPage,
+    canPrevPage,
+    setPage,
+  } = usePagination({ totalItems, itemsPerPage });
+
+  const items = Array
+    .from({ length: totalItems }, (_, i) => `Item ${i + 1}`)
+    .slice(startIndex, endIndex + 1);
 
   return (
     <div>
-      <h2>Pagination Demo</h2>
-      <p>Total Items: {totalItems}</p>
+      <label style={{ display: 'block', marginBottom: '1rem' }}>
+        Items per page:&nbsp;
+        <select
+          value={itemsPerPage}
+          onChange={e => setItemsPerPage(Number(e.target.value))}
+        >
+          {[5, 10, 20, 50].map(n => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+      </label>
+
       <ul>
-        {items.map(item => (
-          <li key={item}>{item}</li>
-        ))}
+        {items.map(item => <li key={item}>{item}</li>)}
       </ul>
-      <button onClick={prevPage} disabled={!canPrevPage}>Previous</button>
-      <span> Page {currentPage} of {totalPages} </span>
-      <button onClick={nextPage} disabled={!canNextPage}>Next</button>
-      <div>
+
+      <div style={{ marginTop: '1rem' }}>
+        <button className="button" onClick={prevPage} disabled={!canPrevPage}>
+          Previous
+        </button>
+        <span> Page {currentPage} of {totalPages} </span>
+        <button className="button" onClick={nextPage} disabled={!canNextPage}>
+          Next
+        </button>
+      </div>
+
+      <div style={{ marginTop: '1rem' }}>
         {Array.from({ length: totalPages }, (_, i) => (
-          <button key={i} onClick={() => setPage(i + 1)} disabled={currentPage === i + 1}>
+          <button
+            key={i}
+            className="button"
+            onClick={() => setPage(i + 1)}
+            disabled={currentPage === i + 1}
+          >
             {i + 1}
           </button>
         ))}
       </div>
-      <p>Showing items {startIndex + 1}–{endIndex + 1} (Total on this page: {itemsOnCurrentPage})</p>
+
+      <p style={{ marginTop: '1rem' }}>
+        Showing items {startIndex + 1}–{endIndex + 1} (Total on this page: {itemsOnCurrentPage})
+      </p>
     </div>
   );
 }
